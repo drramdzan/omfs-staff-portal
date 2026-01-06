@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OMFS Staff Portal</title>
+
+  <!-- PWA / Android -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#1f4fd8">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- iOS -->
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="OMFS Portal">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
+
+  <style>
+    :root{
+      --bg0:#f2f6ff;
+      --bg1:#f7f9ff;
+      --card:rgba(255,255,255,.8);
+      --text:#0b1220;
+      --muted:#5b667a;
+      --primary:#1f4fd8;
+      --shadow1:0 10px 30px rgba(2,6,23,.08);
+      --shadow2:0 22px 70px rgba(2,6,23,.14);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,var(--bg0),var(--bg1));
+    }
+
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+
+    .hero{
+      text-align:center;
+      background:linear-gradient(135deg,#1f4fd8,#163db3);
+      color:#fff;
+      padding:18px;
+      border-radius:28px;
+      box-shadow:var(--shadow2);
+    }
+    .hero h1{margin:0;font-size:22px}
+    .hero .sub{margin-top:6px;font-size:13px;line-height:1.4}
+
+    .toolbar{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+    }
+    @media(max-width:720px){
+      .toolbar{grid-template-columns:1fr}
+    }
+
+    .panel{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow1);
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .panel input{
+      border:none;
+      outline:none;
+      width:100%;
+      font-size:14px;
+      background:transparent;
+    }
+
+    .btn{
+      cursor:pointer;
+      transition:transform .15s, box-shadow .15s, filter .15s;
+      border:none;
+      background:transparent;
+    }
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:var(--shadow2);
+      filter:brightness(1.05);
+    }
+    .btn:active{transform:translateY(0)}
+
+    .favBtn{
+      font-size:13px;
+      padding:10px 14px;
+      border-radius:var(--radius);
+      background:var(--card);
+      box-shadow:var(--shadow1);
+    }
+
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+    }
+    @media(max-width:980px){.grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:420px){.grid{grid-template-columns:1fr}}
+
+    .app{
+      background:var(--card);
+      border-radius:22px;
+      padding:14px;
+      min-height:130px;
+      box-shadow:var(--shadow1);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .app::before{
+      content:"";
+      position:absolute;
+      top:0;left:0;right:0;
+      height:4px;
+      background:var(--accent,var(--primary));
+    }
+
+    .badge{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(0,0,0,.06);
+    }
+
+    .open{
+      margin-top:8px;
+      font-size:12px;
+      font-weight:700;
+      color:var(--primary);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Web App Portal</h1>
+      <div class="sub">
+        Jabatan Bedah Mulut &amp; Maksilofasial<br>
+        Hospital Pasir Gudang
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="panel">
+        <input id="q" placeholder="Search apps...">
+      </div>
+      <button class="favBtn btn" id="favToggle">★ Favourites</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+<script>
+const APPS = [
+  {id:"gabookings",name:"GABOOKINGS",desc:"GA booking slots calendar & session locking",url:"https://ot-oasis.lovable.app",category:"Booking",color:"#1f4fd8",tag:"Core"},
+  {id:"otlist",name:"OMFS OT List",desc:"Session registry, cases list, print PDF",url:"https://script.google.com/macros/s/AKfycbyZ2jk0JRjfjDCBqHlCIFFaRSJ4zZ90w8xBE4-PmI8bfngeKhJsY3ehWW7esgZ84tmS/exec",category:"OT",color:"#0ea5e9",tag:"OT"},
+  {id:"appointmentbook",name:"Appointment Book OMFS HPG",desc:"Room schedules & appointment management",url:"https://bit.ly/4b720BK",category:"Booking",color:"#0f766e",tag:"Clinic"},
+  {id:"cutirehatplanner",name:"Cuti Rehat Planner",desc:"Annual leave calendar & activity tracking",url:"https://grace-leave-planner.lovable.app",category:"Planner",color:"#10b981",tag:"Leave"},
+  {id:"biopsy",name:"Biopsy Registry",desc:"Biopsy registration & histopathology tracking",url:"https://script.google.com/macros/s/AKfycbxf5ZFvP4Eg2uZ-POoci56NolE9Kst6TGuDDShvRpOS1z4sZtdkRC1r-iScQdd3YX52Sg/exec",category:"Registry",color:"#8b5cf6",tag:"Registry"},
+  {id:"preposttest",name:"Pre/Post Test",desc:"Assessment of competency for NDOPs",url:"PASTE_TRAINING_URL_HERE",category:"Training",color:"#f59e0b",tag:"NDOP"},
+  {id:"oncallcase",name:"Oncall Case Registry",desc:"Data entry for oncall cases",url:"https://script.google.com/macros/s/AKfycbxDNrqAouOm7624Zyar1g-KoentXDzyue69YJpolgkWG-PyeXKTmGRYycKbzTO-9BU7/exec",category:"Registry",color:"#ad1457",tag:"Oncall"},
+  {id:"kpiomfs",name:"National OMFS KPI",desc:"Data collection for KPI",url:"https://docs.google.com/spreadsheets/d/1-tjeF5kxHxDJRWCUWKIgk0nJnY4UVctAjeMTOwYebTo/edit",category:"KPI",color:"#6d28d9",tag:"KPI"}
+];
+
+const grid=document.getElementById("grid");
+const q=document.getElementById("q");
+
+function render(){
+  const term=(q.value||"").toLowerCase();
+  grid.innerHTML=APPS.filter(a=>!term||a.name.toLowerCase().includes(term))
+    .map(a=>`
+      <div class="app btn" style="--accent:${a.color}" onclick="window.open('${a.url}','_blank')">
+        <div>
+          <strong>${a.name}</strong>
+          <div style="font-size:12px;color:#5b667a;margin-top:4px">${a.desc}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="badge">${a.tag}</span>
+          <span class="open">Open</span>
+        </div>
+      </div>
+    `).join("");
+}
+q.addEventListener("input",render);
+render();
+</script>
+
+<!-- Service Worker -->
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
+}
+</script>
+</body>
+</html>
