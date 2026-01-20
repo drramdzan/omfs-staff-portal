@@ -1,215 +1,523 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OMFS Staff Portal</title>
-
-  <!-- PWA / Android -->
-  <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#1f4fd8">
-  <meta name="mobile-web-app-capable" content="yes">
-
-  <!-- iOS -->
-  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="OMFS Portal">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- Icons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
   <style>
-    :root{
-      --bg0:#f2f6ff;
-      --bg1:#f7f9ff;
-      --card:rgba(255,255,255,.8);
-      --text:#0b1220;
-      --muted:#5b667a;
-      --primary:#1f4fd8;
-      --shadow1:0 10px 30px rgba(2,6,23,.08);
-      --shadow2:0 22px 70px rgba(2,6,23,.14);
-      --radius:18px;
+    :root {
+      --ios-blue: #007AFF;
+      --ios-bg: #F2F2F7;
+      --ios-card: #FFFFFF;
+      --ios-text: #000000;
+      --ios-subtext: #8E8E93;
+      --ios-red: #FF3B30;
+      --ios-soft-red: #CD5C5C; /* The requested "slightly reddish" color */
     }
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-      color:var(--text);
-      background:linear-gradient(180deg,var(--bg0),var(--bg1));
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      background-color: var(--ios-bg);
+      color: var(--ios-text);
+      padding-bottom: 90px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .wrap{max-width:1100px;margin:0 auto;padding:18px}
-
-    .hero{
-      text-align:center;
-      background:linear-gradient(135deg,#1f4fd8,#163db3);
-      color:#fff;
-      padding:18px;
-      border-radius:28px;
-      box-shadow:var(--shadow2);
-    }
-    .hero h1{margin:0;font-size:22px}
-    .hero .sub{margin-top:6px;font-size:13px;line-height:1.4}
-
-    .toolbar{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:10px;
-    }
-    @media(max-width:720px){
-      .toolbar{grid-template-columns:1fr}
+    /* HEADER */
+    .sticky-header {
+      position: sticky; top: 0; z-index: 1000;
+      background-color: rgba(242, 242, 247, 0.95);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 0.5px solid rgba(0,0,0,0.1);
+      padding: 15px 20px 10px 20px;
     }
 
-    .panel{
-      background:var(--card);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow1);
-      padding:10px 12px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .brand-logo { color: var(--ios-blue); font-weight: 700; font-size: 16px; letter-spacing: 0.5px; }
+    .header-actions { display: flex; gap: 15px; }
+    .action-link { color: var(--ios-blue); font-size: 16px; font-weight: 600; text-decoration: none; cursor: pointer; }
+    .text-danger-link { color: var(--ios-red) !important; }
 
-    .panel input{
-      border:none;
-      outline:none;
-      width:100%;
-      font-size:14px;
-      background:transparent;
-    }
+    .page-subtitle { font-size: 13px; font-weight: 600; color: var(--ios-subtext); text-transform: uppercase; margin-bottom: 15px; }
 
-    .btn{
-      cursor:pointer;
-      transition:transform .15s, box-shadow .15s, filter .15s;
-      border:none;
-      background:transparent;
-    }
-    .btn:hover{
-      transform:translateY(-2px);
-      box-shadow:var(--shadow2);
-      filter:brightness(1.05);
-    }
-    .btn:active{transform:translateY(0)}
+    .search-box { position: relative; display: flex; align-items: center; }
+    .search-input { width: 100%; background: #E3E3E8; border: none; border-radius: 10px; padding: 10px 40px 10px 38px; font-size: 17px; outline: none; }
+    .search-icon { position: absolute; left: 12px; color: #8E8E93; font-size: 14px; }
+    .scan-btn { position: absolute; right: 10px; background: none; border: none; padding: 5px; cursor: pointer; }
 
-    .favBtn{
-      font-size:13px;
-      padding:10px 14px;
-      border-radius:var(--radius);
-      background:var(--card);
-      box-shadow:var(--shadow1);
-    }
+    .content-area { padding: 15px; }
+    
+    /* CARDS */
+    .item-card { background: var(--ios-card); border-radius: 16px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+    .card-header-custom { padding: 15px; background-color: #fff; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E5EA; }
+    .header-left h5 { font-size: 17px; font-weight: 700; margin: 0; color: #000; }
+    .header-left span { font-size: 13px; color: var(--ios-subtext); }
+    .total-stock { font-size: 20px; font-weight: 700; color: var(--ios-blue); }
+    .total-val { font-size: 11px; color: var(--ios-green); font-weight: 600; display: block; text-align: right; margin-top: 2px;}
+    .text-danger { color: var(--ios-red) !important; }
 
-    .grid{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
-    }
-    @media(max-width:980px){.grid{grid-template-columns:repeat(3,1fr)}}
-    @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:420px){.grid{grid-template-columns:1fr}}
+    /* BATCH ROWS */
+    .batch-row { padding: 12px 15px; display: flex; align-items: center; background-color: #FAFAFC; border-bottom: 1px solid #E5E5EA; cursor: pointer; }
+    .batch-select { display: none; margin-right: 15px; transform: scale(1.3); }
+    .batch-info { flex-grow: 1; display: block; }
+    .batch-qty { font-weight: 600; font-size: 15px; background: #fff; padding: 4px 10px; border-radius: 6px; border: 1px solid #E5E5EA; min-width: 40px; text-align: center; }
+    .cost-tag { font-size: 11px; color: var(--ios-subtext); margin-left: auto; margin-right: 10px; }
 
-    .app{
-      background:var(--card);
-      border-radius:22px;
-      padding:14px;
-      min-height:130px;
-      box-shadow:var(--shadow1);
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      position:relative;
-      overflow:hidden;
-    }
+    /* DASHBOARD */
+    .dashboard-card { background: var(--ios-card); border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+    .dash-label { font-size: 11px; color: var(--ios-subtext); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+    /* Adjusted font size to fit two columns */
+    .dash-value { font-size: 22px; font-weight: 800; color: #000; margin: 5px 0 0 0; }
+    
+    .text-soft-red { color: var(--ios-soft-red) !important; }
+    .text-blue { color: var(--ios-blue) !important; }
 
-    .app::before{
-      content:"";
-      position:absolute;
-      top:0;left:0;right:0;
-      height:4px;
-      background:var(--accent,var(--primary));
-    }
+    .usage-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .usage-table td { padding: 12px 5px; border-bottom: 1px solid #E5E5EA; font-size: 14px; }
+    .usage-table th { text-align: left; font-size: 11px; color: var(--ios-subtext); text-transform: uppercase; padding-bottom: 5px; }
+    .money-col { text-align: right; color: var(--ios-text); font-weight: 600; }
 
-    .badge{
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      background:rgba(0,0,0,.06);
-    }
+    /* UTILS */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-top: 0.5px solid #C6C6C8; display: flex; justify-content: space-around; padding: 10px 0 25px 0; z-index: 2000; }
+    .nav-item { text-align: center; color: var(--ios-subtext); font-size: 10px; cursor: pointer; width: 50%; }
+    .nav-item i { font-size: 22px; margin-bottom: 4px; display: block; }
+    .nav-item.active { color: var(--ios-blue); }
 
-    .open{
-      margin-top:8px;
-      font-size:12px;
-      font-weight:700;
-      color:var(--primary);
-    }
+    .delete-bar { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--ios-red); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4); display: none; z-index: 2000; cursor: pointer; }
+
+    /* MODAL FIXES */
+    .modal { z-index: 3000 !important; }
+    .modal-backdrop { z-index: 2999 !important; }
+    .modal-body { padding-bottom: 40px !important; }
+    .modal-content { border-radius: 20px 20px 0 0; border: none; background: #F2F2F7; }
+    .modal-dialog { margin: 0; position: fixed; bottom: 0; width: 100%; max-width: 100%; }
+    .ios-input { background: #FFFFFF; border: none; border-radius: 10px; padding: 15px; margin-bottom: 10px; font-size: 17px; width: 100%; }
+    .btn-ios { background: var(--ios-blue); color: white; border: none; border-radius: 12px; padding: 15px; font-size: 17px; font-weight: 600; width: 100%; margin-top: 10px; }
+    .btn-outline { background: transparent; border: 1px solid #C6C6C8; color: var(--ios-text); margin-top: 5px; }
+    .label-small { font-size: 11px; font-weight: 600; color: var(--ios-subtext); margin-left: 2px; margin-bottom: 4px; display: block; text-transform: uppercase; }
+    
+    #reader { width: 100%; border-radius: 15px; overflow: hidden; }
+    .hidden { display: none !important; }
+    #loader { padding-top: 50px; }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="hero">
-      <h1>Web App Portal</h1>
-      <div class="sub">
-        Jabatan Bedah Mulut &amp; Maksilofasial<br>
-        Hospital Pasir Gudang
+
+  <div class="sticky-header">
+    <div class="header-top">
+      <div class="brand-logo"><i class="fa-solid fa-hospital-user me-2"></i> STOR UNIT</div>
+      <div class="header-actions">
+        <span class="action-link" id="selectBtn" onclick="toggleSelectMode()">Select</span>
+        <span class="action-link" onclick="refreshInventory()" style="margin-right: 5px;"><i class="fa-solid fa-rotate-right fa-lg"></i></span>
+        <span class="action-link" onclick="openAddModal()"><i class="fa-solid fa-plus fa-lg"></i></span>
       </div>
     </div>
-
-    <div class="toolbar">
-      <div class="panel">
-        <input id="q" placeholder="Search apps...">
-      </div>
-      <button class="favBtn btn" id="favToggle">★ Favourites</button>
+    <div class="page-subtitle">Jabatan Bedah Mulut & Maksilofasial</div>
+    
+    <div class="search-box" id="searchContainer">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search item or Code">
+      <button class="scan-btn" onclick="openScanner()"><i class="fa-solid fa-barcode fa-lg"></i></button>
     </div>
-
-    <div class="grid" id="grid"></div>
   </div>
 
-<script>
-const APPS = [
-  {id:"gabookings",name:"GABOOKINGS",desc:"GA booking slots calendar & session locking",url:"https://ot-oasis.lovable.app",category:"Booking",color:"#1f4fd8",tag:"Core"},
-  {id:"otlist",name:"OMFS OT List",desc:"Session registry, cases list, print PDF",url:"https://script.google.com/macros/s/AKfycbyZ2jk0JRjfjDCBqHlCIFFaRSJ4zZ90w8xBE4-PmI8bfngeKhJsY3ehWW7esgZ84tmS/exec",category:"OT",color:"#0ea5e9",tag:"OT"},
-  {id:"appointmentbook",name:"Appointment Book OMFS HPG",desc:"Room schedules & appointment management",url:"https://bit.ly/4b720BK",category:"Booking",color:"#0f766e",tag:"Clinic"},
-  {id:"cutirehatplanner",name:"Cuti Rehat Planner",desc:"Annual leave calendar & activity tracking",url:"https://grace-leave-planner.lovable.app",category:"Planner",color:"#10b981",tag:"Leave"},
-  {id:"biopsy",name:"Biopsy Registry",desc:"Biopsy registration & histopathology tracking",url:"https://script.google.com/macros/s/AKfycbxf5ZFvP4Eg2uZ-POoci56NolE9Kst6TGuDDShvRpOS1z4sZtdkRC1r-iScQdd3YX52Sg/exec",category:"Registry",color:"#8b5cf6",tag:"Registry"},
-  {id:"preposttest",name:"Pre/Post Test",desc:"Assessment of competency for NDOPs",url:"PASTE_TRAINING_URL_HERE",category:"Training",color:"#f59e0b",tag:"NDOP"},
-  {id:"oncallcase",name:"Oncall Case Registry",desc:"Data entry for oncall cases",url:"https://script.google.com/macros/s/AKfycbxDNrqAouOm7624Zyar1g-KoentXDzyue69YJpolgkWG-PyeXKTmGRYycKbzTO-9BU7/exec",category:"Registry",color:"#ad1457",tag:"Oncall"},
-  {id:"kpiomfs",name:"National OMFS KPI",desc:"Data collection for KPI",url:"https://docs.google.com/spreadsheets/d/1-tjeF5kxHxDJRWCUWKIgk0nJnY4UVctAjeMTOwYebTo/edit",category:"KPI",color:"#6d28d9",tag:"KPI"}
-];
+  <div id="viewStock" class="content-area">
+    <div id="loader" class="text-center">
+      <div class="spinner-border text-secondary" role="status"></div>
+      <p class="mt-2 text-secondary small">Syncing...</p>
+    </div>
+    <div id="inventoryList" class="hidden"></div>
+  </div>
 
-const grid=document.getElementById("grid");
-const q=document.getElementById("q");
-
-function render(){
-  const term=(q.value||"").toLowerCase();
-  grid.innerHTML=APPS.filter(a=>!term||a.name.toLowerCase().includes(term))
-    .map(a=>`
-      <div class="app btn" style="--accent:${a.color}" onclick="window.open('${a.url}','_blank')">
-        <div>
-          <strong>${a.name}</strong>
-          <div style="font-size:12px;color:#5b667a;margin-top:4px">${a.desc}</div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span class="badge">${a.tag}</span>
-          <span class="open">Open</span>
+  <div id="viewDash" class="content-area hidden">
+    
+    <div class="row g-3 mb-3">
+      <div class="col-6">
+        <div class="dashboard-card">
+          <div class="dash-label">Total Asset</div>
+          <div class="dash-value text-blue" id="dashTotal">RM 0</div>
         </div>
       </div>
-    `).join("");
-}
-q.addEventListener("input",render);
-render();
-</script>
+      
+      <div class="col-6">
+        <div class="dashboard-card">
+          <div class="dash-label">Usage (30d)</div>
+          <div class="dash-value text-soft-red" id="dashUsageTotal">RM 0</div>
+        </div>
+      </div>
+    </div>
 
-<!-- Service Worker -->
-<script>
-if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
-}
-</script>
+    <h5 class="fw-bold px-1 mb-3">Top Usage Items</h5>
+    <div class="dashboard-card" style="padding: 0 20px 20px 20px; text-align:left; display:block;">
+       <table class="usage-table">
+         <thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Value</th></tr></thead>
+         <tbody id="dashUsageList"><tr><td colspan="3" class="text-center text-muted py-3">Loading stats...</td></tr></tbody>
+       </table>
+    </div>
+  </div>
+
+  <div id="deleteBar" class="delete-bar" onclick="deleteSelectedItems()">Delete Selected (<span id="deleteCount">0</span>)</div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active" id="navStock" onclick="switchTab('stock')"><i class="fa-solid fa-boxes-stacked"></i> Stock</div>
+    <div class="nav-item" id="navDash" onclick="switchTab('dash')"><i class="fa-solid fa-chart-pie"></i> Dashboard</div>
+  </div>
+
+  <div class="modal fade" id="txModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+             <h2 id="txTitle" class="fw-bold mb-0">Item</h2>
+             <button class="btn btn-sm btn-light text-primary" onclick="switchToEdit()"><i class="fa-solid fa-pen"></i> Edit</button>
+          </div>
+          <div class="d-flex gap-3 mb-4 text-secondary small">
+             <span>Stock: <b id="txStock" class="text-dark"></b> <span id="txUnit"></span></span>
+             <span>Cost: <b id="txCost" class="text-dark"></b></span>
+          </div>
+          <input type="number" id="txQty" class="ios-input" placeholder="Change Amount (e.g. -1)">
+          <input type="text" id="txStaff" class="ios-input" placeholder="Staff Initials">
+          <button class="btn-ios" onclick="submitTransaction()">Confirm Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body p-4">
+          <h4 class="fw-bold mb-3">Edit Details</h4>
+          <span class="label-small">Identity</span>
+          <input type="text" id="editCode" class="ios-input" placeholder="Item Code">
+          <input type="text" id="editName" class="ios-input" placeholder="Item Name">
+          <span class="label-small mt-2">Batch Info</span>
+          <div class="row g-2">
+            <div class="col"><input type="text" id="editExpiry" class="ios-input" placeholder="Expiry"></div>
+            <div class="col"><input type="date" id="editReceived" class="ios-input" style="padding:13px;"></div>
+          </div>
+          <div class="row g-2">
+            <div class="col"><input type="number" id="editStock" class="ios-input" placeholder="Stock"></div>
+            <div class="col"><input type="text" id="editUnit" class="ios-input" placeholder="Unit"></div>
+          </div>
+          <span class="label-small mt-2">Financials</span>
+          <div class="row g-2">
+            <div class="col"><input type="number" step="0.01" id="editCost" class="ios-input" placeholder="Cost (RM)"></div>
+            <div class="col"><input type="number" id="editMin" class="ios-input" placeholder="Min Alert"></div>
+          </div>
+          <button class="btn-ios" onclick="submitEdit()">Save Changes</button>
+          <button class="btn-ios btn-outline" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body p-4">
+          <h4 class="fw-bold mb-3">Receive Stock</h4>
+          <span class="label-small">Item Details</span>
+          <input type="text" id="newCode" class="ios-input" placeholder="Item Code (Scan to fill)">
+          <input type="text" id="newName" class="ios-input" placeholder="Item Name">
+          <span class="label-small mt-2">Batch Details</span>
+          <div class="row g-2">
+            <div class="col"><input type="text" id="newExpiry" class="ios-input" placeholder="Expiry (MM/YY)"></div>
+            <div class="col"><input type="date" id="newReceived" class="ios-input" style="padding:13px;"></div>
+          </div>
+          <div class="row g-2">
+            <div class="col"><input type="number" id="newStock" class="ios-input" placeholder="Qty"></div>
+            <div class="col"><input type="text" id="newUnit" class="ios-input" placeholder="Unit"></div>
+          </div>
+          <div class="row g-2">
+            <div class="col"><input type="number" step="0.01" id="newCost" class="ios-input" placeholder="Unit Cost (RM)"></div>
+            <div class="col"><input type="number" id="newMin" class="ios-input" placeholder="Min Alert"></div>
+          </div>
+          <button class="btn-ios" onclick="submitNewItem()">Add Batch</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="scannerModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <h5 class="fw-bold mb-3">Scan Batch</h5>
+          <div id="reader"></div>
+          <button class="btn btn-secondary w-100 mt-3 rounded-pill" onclick="closeScanner()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let inventory = [];
+    let selectedItem = null;
+    let isSelectMode = false;
+    let selectedRows = new Set();
+    let html5QrcodeScanner = null;
+
+    const txModal = new bootstrap.Modal(document.getElementById('txModal'));
+    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    const addModal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    const scannerModal = new bootstrap.Modal(document.getElementById('scannerModal'));
+
+    window.onload = function() {
+      document.getElementById('newReceived').valueAsDate = new Date();
+      refreshInventory();
+    };
+
+    function refreshInventory() {
+      document.getElementById('loader').classList.remove('hidden');
+      document.getElementById('inventoryList').classList.add('hidden');
+      google.script.run.withSuccessHandler(data => {
+          inventory = data;
+          selectedRows.clear(); updateDeleteBar(); renderList(inventory);
+          document.getElementById('loader').classList.add('hidden');
+          document.getElementById('inventoryList').classList.remove('hidden');
+      }).withFailureHandler(err => alert(err)).getInventoryData();
+    }
+
+    // --- TABS & DASH ---
+    function switchTab(tab) {
+      if (tab === 'stock') {
+        document.getElementById('viewStock').classList.remove('hidden');
+        document.getElementById('viewDash').classList.add('hidden');
+        document.getElementById('navStock').classList.add('active');
+        document.getElementById('navDash').classList.remove('active');
+        document.getElementById('searchContainer').style.display = 'flex';
+        document.getElementById('selectBtn').style.display = 'block';
+      } else {
+        document.getElementById('viewStock').classList.add('hidden');
+        document.getElementById('viewDash').classList.remove('hidden');
+        document.getElementById('navStock').classList.remove('active');
+        document.getElementById('navDash').classList.add('active');
+        document.getElementById('searchContainer').style.display = 'none';
+        document.getElementById('selectBtn').style.display = 'none';
+        loadDashboard();
+      }
+    }
+
+    function loadDashboard() {
+      google.script.run.withSuccessHandler(stats => {
+        // 1. Total Store Value
+        document.getElementById('dashTotal').innerText = "RM " + stats.totalValue.toLocaleString('en-US', {minimumFractionDigits: 0});
+        
+        // 2. Total Usage (30 Days) - NEW
+        document.getElementById('dashUsageTotal').innerText = "RM " + stats.totalUsage.toLocaleString('en-US', {minimumFractionDigits: 0});
+
+        // 3. Top Usage List
+        const html = stats.topUsage.length ? stats.topUsage.map(u => `<tr><td>${u.name}</td><td class="text-center">${u.qty}</td><td class="money-col">RM ${u.cost.toLocaleString('en-US', {minimumFractionDigits: 0})}</td></tr>`).join('') : '<tr><td colspan="3" class="text-center py-3">No usage data yet</td></tr>';
+        document.getElementById('dashUsageList').innerHTML = html;
+      }).getAnalyticsData();
+    }
+
+    // --- RENDER ---
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = inventory.filter(i => 
+        i.name.toLowerCase().includes(term) || 
+        String(i.itemCode).toLowerCase().includes(term)
+      );
+      renderList(filtered);
+    });
+
+    // Date Helpers
+    function getExpiryDate(dateStr) {
+      if (!dateStr || dateStr.length < 5) return "";
+      const d = new Date(dateStr);
+      if (!isNaN(d.getTime()) && dateStr.length > 10) return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+      return dateStr;
+    }
+    function getReceivedDate(dateStr) {
+      if (!dateStr || dateStr.length < 5) return "";
+      const d = new Date(dateStr);
+      if (!isNaN(d.getTime()) && dateStr.length > 10) {
+         const day = String(d.getDate()).padStart(2, '0');
+         const month = String(d.getMonth() + 1).padStart(2, '0');
+         const year = d.getFullYear();
+         return `${day}/${month}/${year}`;
+      }
+      return dateStr;
+    }
+
+    function renderList(items) {
+      const list = document.getElementById('inventoryList');
+      if(items.length === 0) { list.innerHTML = '<div class="text-center text-secondary mt-5">No items found</div>'; return; }
+
+      const groups = {};
+      items.forEach(item => {
+        const key = item.itemCode; 
+        if (!groups[key]) groups[key] = { code: item.itemCode, name: item.name, unit: item.unit, min: item.min, totalStock: 0, totalVal: 0, batches: [] };
+        groups[key].totalStock += Number(item.stock);
+        groups[key].totalVal += (Number(item.stock) * Number(item.cost));
+        groups[key].batches.push(item);
+      });
+
+      const html = Object.values(groups).map(group => {
+        const isLowStock = group.totalStock <= group.min;
+        
+        const batchesHTML = group.batches.map(batch => {
+           const exp = getExpiryDate(batch.expiry);
+           const rec = getReceivedDate(batch.received);
+           const checkboxDisplay = isSelectMode ? 'inline-block' : 'none';
+           const clickAction = isSelectMode ? '' : `onclick="openTxModal(${batch.rowId})"`;
+
+           return `
+           <div class="batch-row" ${clickAction}>
+              <input type="checkbox" class="batch-select" style="display:${checkboxDisplay}" 
+                onclick="handleCheckbox(${batch.rowId}, this); event.stopPropagation();"
+                ${selectedRows.has(batch.rowId) ? 'checked' : ''}>
+              
+              <div class="batch-info" style="display: block;">
+                 <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+                    <i class="fa-solid fa-hourglass-half text-secondary" style="width:16px; text-align:center;"></i>
+                    <span style="font-weight:500; color:#333;">${exp ? exp : 'No Expiry'}</span>
+                 </div>
+                 ${rec ? `
+                 <div style="display:flex; align-items:center; gap:6px;">
+                    <i class="fa-regular fa-calendar text-muted" style="width:16px; text-align:center; font-size:11px;"></i>
+                    <span class="text-muted" style="font-size:11px;">Rec: ${rec}</span>
+                 </div>` : ''}
+              </div>
+
+              <span class="cost-tag">RM ${batch.cost}</span>
+              <div class="batch-qty ${batch.stock <= 0 ? 'text-danger' : ''}">${batch.stock}</div>
+           </div>`;
+        }).join('');
+
+        return `
+        <div class="item-card">
+          <div class="card-header-custom">
+             <div class="header-left">
+                <h5 class="${isLowStock ? 'text-danger' : ''}">${group.name}</h5>
+                <span class="d-block text-secondary small">Code: ${group.code} • ${group.unit}</span>
+             </div>
+             <div class="header-right">
+                <span class="total-stock ${isLowStock ? 'text-danger' : ''}">${group.totalStock}</span>
+                <span class="total-val">RM ${group.totalVal.toLocaleString('en-US', {minimumFractionDigits:2})}</span>
+             </div>
+          </div>
+          <div>${batchesHTML}</div>
+        </div>`;
+      }).join('');
+      list.innerHTML = html;
+    }
+
+    // --- ACTIONS ---
+    function openTxModal(rowId) {
+      selectedItem = inventory.find(i => i.rowId === rowId);
+      document.getElementById('txTitle').innerText = selectedItem.name;
+      document.getElementById('txStock').innerText = selectedItem.stock;
+      document.getElementById('txUnit').innerText = selectedItem.unit;
+      document.getElementById('txCost').innerText = "RM " + selectedItem.cost;
+      document.getElementById('txQty').value = '';
+      txModal.show();
+    }
+    function submitTransaction() {
+      const qty = document.getElementById('txQty').value;
+      const staff = document.getElementById('txStaff').value;
+      if (!qty || !staff) return alert("Fill all fields");
+      const oldStock = selectedItem.stock;
+      selectedItem.stock += Number(qty);
+      renderList(inventory);
+      txModal.hide();
+      google.script.run.withSuccessHandler(() => console.log("Synced")).withFailureHandler(err => { alert(err); selectedItem.stock = oldStock; renderList(inventory); }).processTransaction(selectedItem.rowId, qty, staff);
+    }
+    
+    function switchToEdit() {
+      txModal.hide();
+      document.getElementById('editCode').value = selectedItem.itemCode;
+      document.getElementById('editName').value = selectedItem.name;
+      document.getElementById('editExpiry').value = selectedItem.expiry;
+      document.getElementById('editReceived').value = selectedItem.received ? new Date(selectedItem.received).toISOString().split('T')[0] : '';
+      document.getElementById('editStock').value = selectedItem.stock;
+      document.getElementById('editUnit').value = selectedItem.unit;
+      document.getElementById('editMin').value = selectedItem.min;
+      document.getElementById('editCost').value = selectedItem.cost;
+      editModal.show();
+    }
+    function submitEdit() {
+      const updatedData = {
+        rowId: selectedItem.rowId,
+        itemCode: document.getElementById('editCode').value,
+        name: document.getElementById('editName').value,
+        expiry: document.getElementById('editExpiry').value,
+        received: document.getElementById('editReceived').value,
+        stock: document.getElementById('editStock').value,
+        unit: document.getElementById('editUnit').value,
+        min: document.getElementById('editMin').value,
+        cost: document.getElementById('editCost').value
+      };
+      if(!updatedData.name || !updatedData.itemCode) return alert("Name & Code required");
+      const btn = document.querySelector('#editModal .btn-ios');
+      btn.innerText = "Saving..."; btn.disabled = true;
+      google.script.run.withSuccessHandler(() => { alert("Updated!"); editModal.hide(); btn.innerText = "Save"; btn.disabled = false; refreshInventory(); }).withFailureHandler(err => { alert(err); btn.innerText = "Save"; btn.disabled = false; }).editItem(updatedData);
+    }
+    
+    function openAddModal() { addModal.show(); }
+    function submitNewItem() {
+      const newItem = {
+        itemCode: document.getElementById('newCode').value,
+        name: document.getElementById('newName').value,
+        expiry: document.getElementById('newExpiry').value,
+        received: document.getElementById('newReceived').value,
+        stock: Number(document.getElementById('newStock').value),
+        unit: document.getElementById('newUnit').value,
+        min: Number(document.getElementById('newMin').value),
+        cost: Number(document.getElementById('newCost').value)
+      };
+      if(!newItem.name || !newItem.itemCode) return alert("Code and Name required");
+      const btn = document.querySelector('#addItemModal .btn-ios');
+      btn.innerText = "Saving..."; btn.disabled = true;
+      google.script.run.withSuccessHandler(() => { alert("Added!"); addModal.hide(); btn.innerText = "Save"; btn.disabled = false; refreshInventory(); }).withFailureHandler(err => { alert("Error: " + err); btn.innerText = "Save"; btn.disabled = false; }).addItem(newItem);
+    }
+
+    // --- SCANNER ---
+    function openScanner() {
+      scannerModal.show();
+      setTimeout(() => {
+        if (!html5QrcodeScanner) html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } });
+        html5QrcodeScanner.render((decodedText) => {
+          html5QrcodeScanner.clear(); scannerModal.hide();
+          document.getElementById('searchInput').value = decodedText;
+          const event = new Event('input'); document.getElementById('searchInput').dispatchEvent(event);
+          const matches = inventory.filter(i => String(i.itemCode) === String(decodedText));
+          if (matches.length === 0) { if(confirm("New Item Code. Add item?")) { openAddModal(); document.getElementById('newCode').value = decodedText; } }
+        });
+      }, 300);
+    }
+    function closeScanner() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); scannerModal.hide(); }
+
+    // --- SELECTION ---
+    function toggleSelectMode() {
+      isSelectMode = !isSelectMode;
+      const btn = document.getElementById('selectBtn');
+      if (isSelectMode) { btn.innerText = "Cancel"; btn.classList.add('text-danger-link'); } 
+      else { btn.innerText = "Select"; btn.classList.remove('text-danger-link'); selectedRows.clear(); updateDeleteBar(); }
+      renderList(inventory);
+    }
+    function handleCheckbox(rowId, checkbox) {
+      if (checkbox.checked) selectedRows.add(rowId); else selectedRows.delete(rowId);
+      updateDeleteBar();
+    }
+    function updateDeleteBar() {
+      const bar = document.getElementById('deleteBar');
+      if (selectedRows.size > 0) { bar.style.display = 'block'; document.getElementById('deleteCount').innerText = selectedRows.size; } 
+      else { bar.style.display = 'none'; }
+    }
+    function deleteSelectedItems() {
+      if (!confirm(`Delete ${selectedRows.size} items permanently?`)) return;
+      const btn = document.getElementById('deleteBar'); btn.innerText = "Deleting...";
+      const idsToDelete = Array.from(selectedRows);
+      google.script.run.withSuccessHandler(() => { alert("Deleted"); toggleSelectMode(); refreshInventory(); }).withFailureHandler(err => { alert("Error: " + err); btn.innerText = "Delete Selected"; }).deleteItems(idsToDelete);
+    }
+  </script>
 </body>
 </html>
